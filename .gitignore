@@ -1,20 +1,3 @@
 vendor
 .htaccess
-application/config/config.phpA PHP Error was encountered
-Severity: Warning
-
-Message: session_start(): Failed to initialize storage module: user (path: /var/www/html/sinza/system/sessions)
-
-Filename: Session/Session.php
-
-Line Number: 143
-
-Backtrace:
-
-File: /var/www/html/sinza/application/controllers/Welcome.php
-Line: 5
-Function: __construct
-
-File: /var/www/html/sinza/index.php
-Line: 315
-Function: require_once
+application/config/config.php
