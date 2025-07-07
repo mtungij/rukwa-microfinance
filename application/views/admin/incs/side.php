@@ -196,6 +196,7 @@ $company = $this->queries->get_comp_data($comp_id);
                     <nav class="sidebar-nav">
                         <ul class="main-menu metismenu">
                             <li><a href="<?php echo base_url("admin/cash_transaction"); ?>"><i class="icon-wallet"></i>Cash Transaction</a></li>
+                            <li><a href="<?php echo base_url("admin/cash_transaction"); ?>"><i class="icon-wallet"></i>Loan Statement Report</a></li>
                             <li><a href="<?php echo base_url("admin/blanchiwise_report"); ?>"><i class="icon-list"></i>Branch Wise Report</a></li>
                             <li><a href="<?php echo base_url("admin/loan_pending_time"); ?>"><i class="icon-list"></i>Loan Pending</a></li>
                             <li><a href="<?php echo base_url("admin/repaymant_data"); ?>"><i class="icon-list"></i>Loan Repayment</a></li>
@@ -409,6 +410,7 @@ $company = $this->queries->get_comp_data($comp_id);
                     <nav class="sidebar-nav">
                         <ul class="main-menu metismenu">
                         	<li><a href="<?php echo base_url("admin/cash_transaction"); ?>"><i class="icon-wallet"></i>Cash Transaction</a></li>
+                            <li><a href="<?php echo base_url("admin/statement"); ?>"><i class="icon-wallet"></i>Loan Statement Report</a></li>
                         	<li><a href="<?php echo base_url("admin/blanchiwise_report"); ?>"><i class="icon-list"></i>Branch Wise Report</a></li>
                         	<li><a href="<?php echo base_url("admin/loan_pending_time"); ?>"><i class="icon-list"></i>Loan Pending</a></li>
                         	<li><a href="<?php echo base_url("admin/repaymant_data"); ?>"><i class="icon-list"></i>Loan Repayment</a></li>

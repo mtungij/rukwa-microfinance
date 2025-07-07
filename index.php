@@ -312,4 +312,5 @@ switch (ENVIRONMENT)
  *
  * And away we go...
  */
+require 'vendor/autoload.php'; // Load Composer dependencies
 require_once BASEPATH.'core/CodeIgniter.php';

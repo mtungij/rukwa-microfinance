@@ -181,6 +181,12 @@
 
 <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/select2.min.css">
 <link rel="stylesheet" href="<?php echo base_url() ?>assets/css/croper.min.css">
+<!-- jsPDF for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- SheetJS for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+
 
 </head>
 <body class="theme-cyan">

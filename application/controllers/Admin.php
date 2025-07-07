@@ -1,5 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 
 class Admin extends CI_Controller {
 	public function index()
@@ -34,6 +37,127 @@ class Admin extends CI_Controller {
             'loan_id' => $loan_id
         ]);
     }
+
+public function loan_collection_excel()
+{
+    $this->load->model('queries');
+    $comp_id = $this->session->userdata('comp_id');
+    $loan_collection = $this->queries->get_loan_collection($comp_id);
+
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Auto size columns A to M (one less than before)
+    foreach (range('A', 'M') as $col) {
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
+
+    // Header row without Penart Amount
+    $headers = [
+        'Customer Name', 'Phone No', 'Employee', 'Principal', 'Interest', 'Loan Amount',
+        'Duration Type', 'Collection', 'Paid Amount', 'Remain Amount',
+        'Loan Status', 'Withdrawal Date', 'End Date'
+    ];
+
+    $col = 'A';
+    foreach ($headers as $header) {
+        $sheet->setCellValue($col . '1', $header);
+        $col++;
+    }
+
+    // Bold header
+    $sheet->getStyle('A1:M1')->getFont()->setBold(true);
+
+    $row = 2;
+
+    foreach ($loan_collection as $loan) {
+        $customer_name = $loan->f_name . ' ' . $loan->m_name . ' ' . $loan->l_name;
+        $phone_no = $loan->phone_no;
+        $employee = $loan->empl_name ?: 'Admin';
+        $principal = (float) $loan->loan_aprove;
+        $interest = (float) $loan->loan_int - $principal;
+        $loan_amount = (float) $loan->loan_int;
+
+        // Duration type
+        $duration_type = '';
+        if ($loan->day == 1) {
+            $duration_type = "Daily";
+        } elseif ($loan->day == 7) {
+            $duration_type = "Weekly";
+        } elseif (in_array($loan->day, [28, 29, 30, 31])) {
+            $duration_type = "Monthly";
+        }
+
+        $collection = (float) $loan->restration;
+        $paid_amount = (float) $loan->total_depost + (float) $loan->total_double;
+        $remain_amount = $loan_amount - $paid_amount;
+
+        // Loan status mapping
+        switch ($loan->loan_status) {
+            case 'open':
+                $loan_status = 'Pending';
+                break;
+            case 'aproved':
+                $loan_status = 'Approved';
+                break;
+            case 'withdrawal':
+                $loan_status = 'Active';
+                break;
+            case 'done':
+                $loan_status = 'Done';
+                break;
+            case 'out':
+                $loan_status = 'Default';
+                break;
+            case 'disbarsed':
+                $loan_status = 'Disbursed';
+                break;
+            default:
+                $loan_status = ucfirst($loan->loan_status);
+        }
+
+        $sheet->setCellValue('A' . $row, $customer_name);
+        $sheet->setCellValue('B' . $row, $phone_no);
+        $sheet->setCellValue('C' . $row, $employee);
+        $sheet->setCellValue('D' . $row, $principal);
+        $sheet->setCellValue('E' . $row, $interest);
+        $sheet->setCellValue('F' . $row, $loan_amount);
+        $sheet->setCellValue('G' . $row, $duration_type);
+        $sheet->setCellValue('H' . $row, $collection);
+        $sheet->setCellValue('I' . $row, $paid_amount);
+        $sheet->setCellValue('J' . $row, $remain_amount);
+        $sheet->setCellValue('K' . $row, $loan_status);
+        $sheet->setCellValue('L' . $row, $loan->loan_stat_date);
+        $sheet->setCellValue('M' . $row, substr($loan->loan_end_date, 0, 10));
+
+        $row++;
+    }
+
+    // Add TOTAL row
+    $sheet->setCellValue('A' . $row, 'TOTAL:');
+    $sheet->setCellValue('D' . $row, '=SUM(D2:D' . ($row - 1) . ')'); // Principal total
+    $sheet->setCellValue('F' . $row, '=SUM(F2:F' . ($row - 1) . ')'); // Loan Amount total
+    $sheet->setCellValue('I' . $row, '=SUM(I2:I' . ($row - 1) . ')'); // Paid Amount total
+    $sheet->setCellValue('J' . $row, '=SUM(J2:J' . ($row - 1) . ')'); // Remain Amount total
+
+    // Bold total row
+    $sheet->getStyle('A' . $row . ':M' . $row)->getFont()->setBold(true);
+
+    // Format number columns with commas
+    $sheet->getStyle('D2:J' . $row)
+          ->getNumberFormat()
+          ->setFormatCode('#,##0');
+
+    // Output to browser
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="loan_collection.xlsx"');
+    header('Cache-Control: max-age=0');
+
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer->save('php://output');
+    exit;
+}
+
 
 
     public function customer_schedule($customer_id,$loan_id) {
@@ -9222,7 +9346,39 @@ public function send_email(){
       	$this->load->view('admin/loan_collection',['loan_collection'=>$loan_collection,'income'=>$income,'loan_total'=>$loan_total,'depost_loan'=>$depost_loan,'penart'=>$penart,'penart_paid'=>$penart_paid,'blanch'=>$blanch]);
       }
 
-	  
+      public function statement(){
+      	$this->load->model('queries');
+      	$comp_id = $this->session->userdata('comp_id');
+      	$loan_collection = $this->queries->get_loan_collection($comp_id);
+        $blanch = $this->queries->get_blanch($comp_id);
+      	$this->load->view('admin/loan_statement',['loan_collection'=>$loan_collection,'blanch'=>$blanch]);
+      }
+      
+      public function loan_collection_pdf(){
+          $this->load->model('queries');
+        	$comp_id = $this->session->userdata('comp_id');
+        	$loan_collection = $this->queries->get_loan_collection($comp_id);
+        	$income = $this->queries->get_income($comp_id);
+        	$loan_total = $this->queries->get_total_loan($comp_id);
+        	$depost_loan = $this->queries->get_totalPaid_loan($comp_id);
+        	$penart = $this->queries->get_total_penart($comp_id);
+        	$penart_paid = $this->queries->get_paid_penart($comp_id);
+        	$blanch = $this->queries->get_blanch($comp_id);
+        	$compdata = $this->queries->get_companyData($comp_id);
+
+
+        //         echo "<pre>";
+        //  print_r($loan_collection);
+        //        exit();
+  
+        $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8','format' => 'A4-L','orientation' => 'L']);
+        $html = $this->load->view('admin/loan_collection_report',['compdata'=>$compdata,'loan_collection'=>$loan_collection,'income'=>$income,'loan_total'=>$loan_total,'depost_loan'=>$depost_loan,'penart'=>$penart,'penart_paid'=>$penart_paid,'blanch'=>$blanch],true);
+        $mpdf->SetFooter('Generated By Brainsoft Technology');
+        $mpdf->WriteHTML($html);
+        $mpdf->Output();
+
+
+      }	  
        public function print_all_loanCollection(){
       	$this->load->model('queries');
         $comp_id = $this->session->userdata('comp_id');

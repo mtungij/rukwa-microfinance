@@ -3380,7 +3380,7 @@ public function get_totalLoanDoneGroup($group_id){
 
 
  public function get_loan_collection($comp_id){
- 	$loan_data = $this->db->query("SELECT pn.penart_paid,SUM(d.depost) AS total_depost,c.f_name,c.m_name,c.l_name,b.blanch_name,l.loan_id,l.loan_int,l.restration,l.loan_status,ot.loan_end_date,e.username,l.day,ot.loan_stat_date,SUM(d.double_amont) AS total_double,l.loan_aprove FROM tbl_loans l 
+ 	$loan_data = $this->db->query("SELECT pn.penart_paid,SUM(d.depost) AS total_depost,c.f_name,c.m_name,c.l_name,c.phone_no,b.blanch_name,l.loan_id,l.loan_int,l.restration,l.loan_status,ot.loan_end_date,e.empl_name,l.day,l.session,ot.loan_stat_date,SUM(d.double_amont) AS total_double,l.loan_aprove FROM tbl_loans l 
 	 LEFT JOIN tbl_pay_penart pn ON pn.loan_id = l.loan_id  
 	 LEFT JOIN tbl_depost d ON d.loan_id = l.loan_id 
 	 JOIN tbl_customer c ON c.customer_id = l.customer_id 
