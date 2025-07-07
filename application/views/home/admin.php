@@ -20,7 +20,7 @@
  		}
  	</style> 
  		<style> 
- 		body {background-image: url('<?php echo base_url(); ?>assets/img/boda.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-size: 100% 100%; } </style> <!-- WRAPPER --> 
+ 		body {background-image: url('<?php echo base_url(); ?>assets/img/bodaa.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-size: 100% 100%; } </style> <!-- WRAPPER --> 
  		<div class="container"> <div class=""> <div class="">
  		 <br><br><br><br><br> <div class="">
  		  <div class="row"> 
